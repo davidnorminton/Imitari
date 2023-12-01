@@ -2,18 +2,15 @@ import SwiftUI
 
 
 struct MainImage: View {
-    @Binding var currentFile: String
-    @Binding var zoom: Double
-    @Binding var aspectRatio: String
-    @Binding var isVertFlipped: Bool
-    @Binding var isHorzFlipped: Bool
+
+    @EnvironmentObject var currentAppState:  CurrentAppState
 
     var dirPath = DirectoryPath()
     var imageSaver = ImageSaver()
     
     var body: some View {
-        let file = currentFile.removingPercentEncoding
-        let url = URL(fileURLWithPath: file ?? currentFile.replacingOccurrences(of: "%20", with: " "))
+        let file = currentAppState.currentFile.removingPercentEncoding
+        let url = URL(fileURLWithPath: file ?? currentAppState.currentFile.replacingOccurrences(of: "%20", with: " "))
         
         if let imageData = try? Data(contentsOf: url),
            let nsImage = NSImage(data: imageData) {
@@ -23,22 +20,25 @@ struct MainImage: View {
                         let image = Image(nsImage: nsImage)
                             .resizable()
                             .scaledToFill()
-                            .scaleEffect(x: isHorzFlipped ? -1 : 1, y: isVertFlipped ? -1 : 1)
+                            .scaleEffect(
+                                x: currentAppState.isHorzFlipped ? -1 : 1,
+                                y: currentAppState.isVertFlipped ? -1 : 1
+                            )
 
-                        switch aspectRatio {
+                        switch currentAppState.aspectRatio {
                         case "fit":
-                            image.frame(height: CGFloat(geometry.size.height) * CGFloat(zoom))
+                            image.frame(height: CGFloat(geometry.size.height) * CGFloat(currentAppState.zoom))
                         case "fill":
-                            image.frame(width: CGFloat(geometry.size.width) * CGFloat(zoom))
+                            image.frame(width: CGFloat(geometry.size.width) * CGFloat(currentAppState.zoom))
                         default:
-                            image.frame(height: CGFloat(geometry.size.height) * CGFloat(zoom))
+                            image.frame(height: CGFloat(geometry.size.height) * CGFloat(currentAppState.zoom))
                         }
                     }
                 }
-                .navigationTitle(dirPath.getFileNameFromPath(path: currentFile))
+                    .navigationTitle(dirPath.getFileNameFromPath(path: currentAppState.currentFile))
             )
         } else {
-            return AnyView(Text("Unable to open file: \(currentFile)"))
+            return AnyView(Text("Unable to open file: \(currentAppState.currentFile)"))
         }
     }
 

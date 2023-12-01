@@ -10,11 +10,7 @@ import SwiftUI
 
 struct NavigationButtonsGroup: View {
     
-    @Binding var currentFile: String
-    @Binding var currentDirectory: String
-    @Binding var currentFileNumber: Int
-    @Binding var totalFiles: Int
-    @Binding var allFiles: Array<String>
+    @EnvironmentObject var currentAppState:  CurrentAppState
 
     var filesDir = FilesInDirectory()
 
@@ -22,16 +18,16 @@ struct NavigationButtonsGroup: View {
         HStack {
             // goto prev file in directory
             Button {
-                if (allFiles.count > 0) {
-                    let fileCount = allFiles.count
+                if (currentAppState.allFiles.count > 0) {
+                    let fileCount = currentAppState.allFiles.count
 
-                    if (currentFileNumber == 1) {
-                        currentFile = currentDirectory + "/" + allFiles[fileCount - 1]
-                        currentFileNumber = fileCount
+                    if (currentAppState.currentFileNumber == 1) {
+                        currentAppState.currentFile = currentAppState.currentDirectory + "/" + currentAppState.allFiles[fileCount - 1]
+                        currentAppState.currentFileNumber = fileCount
 
                     } else {
-                        currentFile = currentDirectory + "/" + allFiles[currentFileNumber - 2]
-                        currentFileNumber -= 1
+                        currentAppState.currentFile = currentAppState.currentDirectory + "/" + currentAppState.allFiles[currentAppState.currentFileNumber - 2]
+                        currentAppState.currentFileNumber -= 1
                     }
                 }
             } label: {
@@ -40,18 +36,18 @@ struct NavigationButtonsGroup: View {
             .help("Previous file")
 
             // FilePosition / Total files
-            Text(String(currentFileNumber) + " / " + String(totalFiles))
+            Text(String(currentAppState.currentFileNumber) + " / " + String(currentAppState.totalFiles))
                 .frame(width: 60)
             
             // Goto next file in directory
             Button {
-                if (allFiles.count > 0) {
-                    if (currentFileNumber == allFiles.count) {
-                        currentFile = currentDirectory + "/" + allFiles[0]
-                        currentFileNumber = 1
+                if (currentAppState.allFiles.count > 0) {
+                    if (currentAppState.currentFileNumber == currentAppState.allFiles.count) {
+                        currentAppState.currentFile = currentAppState.currentDirectory + "/" + currentAppState.allFiles[0]
+                        currentAppState.currentFileNumber = 1
                     } else {
-                        currentFile = currentDirectory + "/" + allFiles[currentFileNumber]
-                        currentFileNumber += 1
+                        currentAppState.currentFile = currentAppState.currentDirectory + "/" + currentAppState.allFiles[currentAppState.currentFileNumber]
+                        currentAppState.currentFileNumber += 1
                     }
                 }
             } label: {

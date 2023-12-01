@@ -10,15 +10,15 @@ import SwiftUI
 
 struct ZoomButtonsGroup: View {
     
-    @Binding var zoom: Double
-    
+    @EnvironmentObject var currentAppState:  CurrentAppState
+
     var zoomState = Zoom()
 
     var body: some View {
         HStack {
             // Zoom out
             Button {
-                zoom = zoomState.zoomOut(counter: zoom)
+                currentAppState.zoom = zoomState.zoomOut(counter: currentAppState.zoom)
             } label: {
                 Image(systemName: "minus.magnifyingglass")
             }
@@ -27,7 +27,7 @@ struct ZoomButtonsGroup: View {
             
             // Rest to normal
             Button {
-                zoom = zoomState.reset()
+                currentAppState.zoom = zoomState.reset()
             } label: {
                 Image(systemName: "dot.arrowtriangles.up.right.down.left.circle")
             }
@@ -35,7 +35,7 @@ struct ZoomButtonsGroup: View {
             
             // zoom in
             Button {
-                zoom  = zoomState.zoomIn(counter: zoom)
+                currentAppState.zoom  = zoomState.zoomIn(counter: currentAppState.zoom)
             } label: {
                 Image(systemName: "plus.magnifyingglass")
             }

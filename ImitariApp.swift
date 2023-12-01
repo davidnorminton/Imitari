@@ -13,20 +13,10 @@ import Foundation
 struct ImitariApp: App {
     
     @State private var importing = false
-    @State private var currentFile = ""
-    @State private var currentDirectory = "/"
-    @State private var zoom = 1.00
-    @State private var currentFileNumber = 0
-    @State private var totalFiles = 0
-    @State private var aspectRatio = "fit"
-    @State private var allFiles = [String]()
-    @State private var showSlideShow = false
-    @State private var showSettings = false
-    @State private var slideShowInterval = 3
-    @State private var isVertFlipped = false
-    @State private var isHorzFlipped = false
+
     
     // EnviromentObject states
+    @StateObject var currentAppState = CurrentAppState()
     @StateObject var slideShowState = SlideShowState()
 
 
@@ -39,17 +29,8 @@ struct ImitariApp: App {
 
         WindowGroup {
             GeometryReader { proxy in
-                ContentView(
-                    currentFile: $currentFile,
-                    currentDirectory: $currentDirectory,
-                    zoom: $zoom,
-                    currentFileNumber: $currentFileNumber,
-                    totalFiles: $totalFiles,
-                    aspectRatio: $aspectRatio,
-                    allFiles: $allFiles,
-                    isVertFlipped: $isVertFlipped,
-                    isHorzFlipped: $isHorzFlipped
-                )
+                ContentView()
+                .environmentObject(currentAppState)
                 .environmentObject(slideShowState)
                 .onOpenURL(perform: { url in
                     Logger.shared.log("open url.")
@@ -59,17 +40,17 @@ struct ImitariApp: App {
 
                     if (diretoryPath.isPathFile(path: url.path())) {
                         let chosenDirectory = diretoryPath.getDirectoryOfImage(image: url.path())
-                        currentDirectory = chosenDirectory
+                        currentAppState.currentDirectory = chosenDirectory
 
                         if let currentFilePos = filesInDir.currentFile(
                             current: url.absoluteString,
-                            dir: currentDirectory,
+                            dir: currentAppState.currentDirectory,
                             type: "current"
                         ) {
-                            currentFile = currentFilePos.path
-                            currentFileNumber = currentFilePos.position
-                            totalFiles = currentFilePos.totalFiles
-                            allFiles = currentFilePos.allFilesInDir
+                            currentAppState.currentFile = currentFilePos.path
+                            currentAppState.currentFileNumber = currentFilePos.position
+                            currentAppState.totalFiles = currentFilePos.totalFiles
+                            currentAppState.allFiles = currentFilePos.allFilesInDir
                         }
                     }
                 })
@@ -79,8 +60,8 @@ struct ImitariApp: App {
             CommandGroup(before: CommandGroupPlacement.newItem) {
                 Button("Open image or directory") {
                     importing = true
-                    isVertFlipped = false
-                    isHorzFlipped = false
+                    currentAppState.isVertFlipped = false
+                    currentAppState.isHorzFlipped = false
                 }
                 .fileImporter(
                     isPresented: $importing,
@@ -94,24 +75,28 @@ struct ImitariApp: App {
 
                         if (diretoryPath.isPathFile(path: filePath)) {
                             let chosenDirectory = diretoryPath.getDirectoryOfImage(image: filePath)
-                            currentDirectory = chosenDirectory
+                            currentAppState.currentDirectory = chosenDirectory
  
-                            if let currentFilePos = filesInDir.currentFile(current: filePath, dir: currentDirectory, type: "current") {
-                                currentFile = currentFilePos.path
-                                currentFileNumber = currentFilePos.position
-                                totalFiles = currentFilePos.totalFiles
-                                allFiles = currentFilePos.allFilesInDir
+                            if let currentFilePos = filesInDir.currentFile(
+                                current: filePath,
+                                dir: currentAppState.currentDirectory,
+                                type: "current"
+                            ) {
+                                currentAppState.currentFile = currentFilePos.path
+                                currentAppState.currentFileNumber = currentFilePos.position
+                                currentAppState.totalFiles = currentFilePos.totalFiles
+                                currentAppState.allFiles = currentFilePos.allFilesInDir
                             }
                         } else {
                             let firstImage = diretoryPath.getFirstFile(directory: filePath) ?? ""
-                            currentDirectory = filePath
+                            currentAppState.currentDirectory = filePath
                             
                             if (firstImage.count > 0) {
-                                if let firstFile = filesInDir.firstFile(dir: currentDirectory) {
-                                    currentFile = firstFile.path
-                                    currentFileNumber = firstFile.position
-                                    totalFiles = firstFile.totalFiles
-                                    allFiles = firstFile.allFilesInDir
+                                if let firstFile = filesInDir.firstFile(dir: currentAppState.currentDirectory) {
+                                    currentAppState.currentFile = firstFile.path
+                                    currentAppState.currentFileNumber = firstFile.position
+                                    currentAppState.totalFiles = firstFile.totalFiles
+                                    currentAppState.allFiles = firstFile.allFilesInDir
                                 }
                             }
                         }
@@ -124,18 +109,16 @@ struct ImitariApp: App {
             }
             CommandMenu("Tools") {
                 
-                Navigate(
-                    allFiles: $allFiles,
-                    currentFileNumber: $currentFileNumber,
-                    currentFile: $currentFile,
-                    currentDirectory: $currentDirectory
-                )
+                Navigate().environmentObject(currentAppState)
+
                 
                 SlideShowCmd().environmentObject(slideShowState)
                 
-                ZoomCmdsGroup(zoom: $zoom)
+                ZoomCmdsGroup().environmentObject(currentAppState)
+
                 
-                ScaleContent(aspectRatio: $aspectRatio)
+                ScaleContent().environmentObject(currentAppState)
+
                 
                 Button("Rotate left") {
                     
@@ -146,19 +129,19 @@ struct ImitariApp: App {
                 
                 Button("Flip vertical") {
                     // flip vertical
-                    if isVertFlipped {
-                        isVertFlipped = false
+                    if currentAppState.isVertFlipped {
+                        currentAppState.isVertFlipped = false
                     } else {
-                        isVertFlipped = true
+                        currentAppState.isVertFlipped = true
                     }
                 }
                 
                 Button("Flip horizonatal") {
                     // flip horizontal
-                    if isHorzFlipped {
-                        isHorzFlipped = false
+                    if currentAppState.isHorzFlipped {
+                        currentAppState.isHorzFlipped = false
                     } else {
-                        isHorzFlipped = true
+                        currentAppState.isHorzFlipped = true
                     }
                 }
             }

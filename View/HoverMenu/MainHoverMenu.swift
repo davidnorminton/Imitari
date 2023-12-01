@@ -10,33 +10,21 @@ import SwiftUI
 
 
 struct MainHoverMenu: View {
-    @Binding var currentFile: String
-    @Binding var currentDirectory: String
-    @Binding var zoom: Double
-    @Binding var currentFileNumber: Int
-    @Binding var totalFiles: Int
-    @Binding var showMenu: Bool
-    @Binding var allFiles: Array<String>
-    @Binding var isVertFlipped: Bool
-    @Binding var isHorzFlipped: Bool
 
+    
+    @EnvironmentObject var currentAppState:  CurrentAppState
     @EnvironmentObject var slideShowState:  SlideShowState
 
     var aspectRatios = ["fill", "fit"]
 
     var body: some View {
-        if (showMenu) {
+        if (currentAppState.showMenu) {
             VStack {
                 VStack {
                     HStack {
               
-                        NavigationButtonsGroup(
-                            currentFile: $currentFile,
-                            currentDirectory: $currentDirectory,
-                            currentFileNumber: $currentFileNumber,
-                            totalFiles: $totalFiles,
-                            allFiles: $allFiles
-                        )
+                        NavigationButtonsGroup()
+                            .environmentObject(currentAppState)
                         
                         Button {
                             slideShowState.showSlideShow = true
@@ -47,7 +35,8 @@ struct MainHoverMenu: View {
                         .help("Play slide show")
                         .padding([.trailing, .leading], 10)
                         
-                        ZoomButtonsGroup(zoom: $zoom)
+                        ZoomButtonsGroup()
+                            .environmentObject(currentAppState)
                         
                     }
                     .padding([.bottom], 5)
