@@ -17,20 +17,20 @@ struct ContentView: View {
     @Binding var totalFiles: Int
     @Binding var aspectRatio: String
     @Binding var allFiles: Array<String>
-    @Binding var showSlideShow: Bool
-    @Binding var slideShowInterval: Int
     @Binding var isVertFlipped: Bool
     @Binding var isHorzFlipped: Bool
-
     
     @State private var showMenu: Bool = false
+    
+    @EnvironmentObject var slideShowState:  SlideShowState
+
     
     var aspectRatios = ["fill", "fit"]
     
     var body: some View {
         
         GeometryReader { proxy in
-            if (!showSlideShow) {
+            if (!slideShowState.showSlideShow) {
                 ZStack {
 
                     VStack {
@@ -55,10 +55,10 @@ struct ContentView: View {
                         totalFiles: $totalFiles,
                         showMenu: $showMenu,
                         allFiles: $allFiles,
-                        showSlideShow: $showSlideShow,
                         isVertFlipped: $isVertFlipped,
                         isHorzFlipped: $isHorzFlipped
                     )
+                    .environmentObject(slideShowState)
                     
                 }
                 .onHover { over in
@@ -73,12 +73,11 @@ struct ContentView: View {
                     SlideShow(
                         allFiles: $allFiles,
                         currentDirectory: $currentDirectory,
-                        showSlideShow: $showSlideShow,
                         currentFile: $currentFile,
                         currentFileNumber: $currentFileNumber,
-                        aspectRatio: $aspectRatio,
-                        slideShowInterval: $slideShowInterval
+                        aspectRatio: $aspectRatio
                     )
+                    .environmentObject(slideShowState)
                 }
             }
         }

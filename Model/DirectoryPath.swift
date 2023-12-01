@@ -69,25 +69,27 @@ class DirectoryPath {
         return nil
     }
     
-    /**
-     * Get all allowed files in a directory
-     */
-    func getFilesInDir(dir: String) -> Array<String>? {
-        do {
-            var images = [String]()
-            let items = try FileManager.default.contentsOfDirectory(atPath: dir.removingPercentEncoding ?? dir)
+    func getFilesInDir(dir: String) -> [String]? {
+        let allowedTypes = ["jpg", "jpeg", "png"] // Add your allowed file types here
 
-            for item in items {
-                for type in allowedTypes {
-                    if (item.hasSuffix(type)) {
-                        images.append(item)
-                    }
-                }
-            }
-            return images
+        do {
+            var files = [String]()
+            let directoryURL = URL(fileURLWithPath: dir)
+            let items = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
+            
+            // Filter files based on allowed types
+            let filteredItems = items.filter { allowedTypes.contains($0.pathExtension.lowercased()) }
+            
+            // Get file names from filtered items
+            files = filteredItems.map { $0.lastPathComponent }
+            
+            // Sort file names using Finder-like natural sorting order
+            files.sort { $0.localizedStandardCompare($1) == .orderedAscending }
+            
+            return files
         } catch {
-            // failed to read directory – bad permissions, perhaps?
+            print("Failed to read directory:", error.localizedDescription)
             return nil
-        }        
+        }
     }
 }

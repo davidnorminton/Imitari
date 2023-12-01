@@ -16,13 +16,13 @@ struct SlideShow: View {
     @State private var path = ""
     @Binding var allFiles: [String]
     @Binding var currentDirectory: String
-    @Binding var showSlideShow: Bool
     @Binding var currentFile: String
     @Binding var currentFileNumber: Int
     @Binding var aspectRatio: String
-    @Binding var slideShowInterval: Int
     @State var counter = 1
     
+    @EnvironmentObject var slideShowState:  SlideShowState
+
     var dirPath = DirectoryPath()
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -61,7 +61,7 @@ struct SlideShow: View {
         }
         
         .onReceive(timer) { _ in
-            if counter == slideShowInterval {
+            if counter == slideShowState.slideShowInterval {
                 currentIndex = (currentIndex + 1) % allFiles.count
                 loadNextImage()
                 counter = 1
@@ -73,7 +73,7 @@ struct SlideShow: View {
             loadNextImage()
         }
         .onTapGesture {
-           showSlideShow = false
+            slideShowState.showSlideShow = false
         }
     }
     

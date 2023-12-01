@@ -26,6 +26,9 @@ struct ImitariApp: App {
     @State private var isVertFlipped = false
     @State private var isHorzFlipped = false
     
+    // EnviromentObject states
+    @StateObject var slideShowState = SlideShowState()
+
 
     var diretoryPath = DirectoryPath()
     var filesInDir = FilesInDirectory()
@@ -44,11 +47,10 @@ struct ImitariApp: App {
                     totalFiles: $totalFiles,
                     aspectRatio: $aspectRatio,
                     allFiles: $allFiles,
-                    showSlideShow: $showSlideShow,
-                    slideShowInterval: $slideShowInterval,
                     isVertFlipped: $isVertFlipped,
                     isHorzFlipped: $isHorzFlipped
                 )
+                .environmentObject(slideShowState)
                 .onOpenURL(perform: { url in
                     Logger.shared.log("open url.")
                     Logger.shared.log(url.absoluteString)
@@ -60,7 +62,7 @@ struct ImitariApp: App {
                         currentDirectory = chosenDirectory
 
                         if let currentFilePos = filesInDir.currentFile(
-                            current: url.path(),
+                            current: url.absoluteString,
                             dir: currentDirectory,
                             type: "current"
                         ) {
@@ -129,12 +131,36 @@ struct ImitariApp: App {
                     currentDirectory: $currentDirectory
                 )
                 
-                SlideShowCmd(showSlideShow: $showSlideShow, slideShowInterval:$slideShowInterval)
+                SlideShowCmd().environmentObject(slideShowState)
                 
                 ZoomCmdsGroup(zoom: $zoom)
                 
                 ScaleContent(aspectRatio: $aspectRatio)
-                Text("v2")
+                
+                Button("Rotate left") {
+                    
+                }
+                Button("Rotate right") {
+                    
+                }
+                
+                Button("Flip vertical") {
+                    // flip vertical
+                    if isVertFlipped {
+                        isVertFlipped = false
+                    } else {
+                        isVertFlipped = true
+                    }
+                }
+                
+                Button("Flip horizonatal") {
+                    // flip horizontal
+                    if isHorzFlipped {
+                        isHorzFlipped = false
+                    } else {
+                        isHorzFlipped = true
+                    }
+                }
             }
         }
     }

@@ -13,7 +13,7 @@ struct MainImage: View {
     
     var body: some View {
         let file = currentFile.removingPercentEncoding
-        let url = URL(fileURLWithPath: file ?? currentFile)
+        let url = URL(fileURLWithPath: file ?? currentFile.replacingOccurrences(of: "%20", with: " "))
         
         if let imageData = try? Data(contentsOf: url),
            let nsImage = NSImage(data: imageData) {
