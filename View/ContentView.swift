@@ -31,8 +31,8 @@ struct ContentView: View {
                     }
                     
                     MainHoverMenu()
-                    .environmentObject(currentAppState)
-                    .environmentObject(slideShowState)
+                        .environmentObject(currentAppState)
+                        .environmentObject(slideShowState)
                     
                 }
                 .onHover { over in
@@ -45,8 +45,8 @@ struct ContentView: View {
             } else {
                 ZStack {
                     SlideShow()
-                    .environmentObject(currentAppState)
-                    .environmentObject(slideShowState)
+                        .environmentObject(currentAppState)
+                        .environmentObject(slideShowState)
                 }
             }
         }

@@ -19,7 +19,7 @@ struct NavigationButtonsGroup: View {
         HStack {
             // goto prev file in directory
             Button {
-                currentAppState.nextFile()
+                currentAppState.previousFile()
             } label: {
                 Image(systemName: "chevron.left")
             }
@@ -31,7 +31,7 @@ struct NavigationButtonsGroup: View {
             
             // Goto next file in directory
             Button {
-                currentAppState.previousFile()
+                currentAppState.nextFile()
             } label: {
                 Image(systemName: "chevron.right")
             }

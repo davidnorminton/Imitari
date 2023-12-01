@@ -15,29 +15,19 @@ struct AxisCmds: View {
     var body: some View {
         VStack {
             Button("Rotate left") {
-                
+                currentAppState.rotateLeft()
             }
             
             Button("Rotate right") {
-                
+                currentAppState.rotateRight()
             }
             
             Button("Flip vertical") {
-                // flip vertical
-                if currentAppState.isVertFlipped {
-                    currentAppState.isVertFlipped = false
-                } else {
-                    currentAppState.isVertFlipped = true
-                }
+                currentAppState.flipVertical()
             }
             
             Button("Flip horizonatal") {
-                // flip horizontal
-                if currentAppState.isHorzFlipped {
-                    currentAppState.isHorzFlipped = false
-                } else {
-                    currentAppState.isHorzFlipped = true
-                }
+                currentAppState.flipHorizontal()
             }
         }
     }

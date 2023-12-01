@@ -10,6 +10,7 @@ import SwiftUI
 
 final class CurrentAppState: ObservableObject {
     
+    @Published var cgUrl: URL? = nil
     @Published var currentFile: String = ""
     @Published var currentDirectory: String = ""
     @Published var currentFileNumber: Int = 1
@@ -26,28 +27,55 @@ final class CurrentAppState: ObservableObject {
     var diretoryPath = DirectoryPath()
     var filesInDir = FilesInDirectory()
 
+    
+    func setCurrentFileUrl() {
+        print("reached")
+        // Safely unwrap the optional file path
+        guard let decodedFilePath = currentFile.removingPercentEncoding else {
+            print("Unable to decode file path")
+            return
+        }
+        
+        // Create URL using the decoded file path
+        let fileURL = URL(fileURLWithPath: decodedFilePath)
+
+        // Check if the file URL is a file URL and if it actually exists
+        if fileURL.isFileURL && FileManager.default.fileExists(atPath: fileURL.path) {
+            cgUrl = fileURL
+        } else {
+            print("Invalid file path or file does not exist: \(fileURL)")
+        }
+    }
     /**
      * Goto next file in list
      */
-    func nextFile() {
-        if self.allFiles.count > 0 {
-            let fileCount = self.allFiles.count
+    func previousFile() {
+        if allFiles.count > 0 {
 
-            if self.currentFileNumber == 1 {
-                self.currentFile = self.currentDirectory + "/" + self.allFiles[fileCount - 1]
-                self.currentFileNumber = fileCount
+            let fileCount = allFiles.count
+
+            if currentFileNumber == 1 {
+                currentFile = currentDirectory + "/" + allFiles[fileCount - 1]
+                currentFileNumber = fileCount
+                print("current")
+                print(currentFile)
             } else {
-                self.currentFile = self.currentDirectory + "/" + self.allFiles[self.currentFileNumber - 2]
-                self.currentFileNumber -= 1
+                currentFile = currentDirectory + "/" + allFiles[currentFileNumber - 2]
+                print("current")
+                print(currentFile)
+                currentFileNumber -= 1
             }
+            
+            setCurrentFileUrl()
         }
     }
     
     /**
      * Goto previous file in list
      */
-    func previousFile() {
+    func nextFile() {
         if (self.allFiles.count > 0) {
+
             if (self.currentFileNumber == self.allFiles.count) {
                 self.currentFile = self.currentDirectory + "/" + self.allFiles[0]
                 self.currentFileNumber = 1
@@ -55,21 +83,25 @@ final class CurrentAppState: ObservableObject {
                 self.currentFile = self.currentDirectory + "/" + self.allFiles[self.currentFileNumber]
                 self.currentFileNumber += 1
             }
+            
+            setCurrentFileUrl()
         }
     }
     
-    func setCurrentState(path: String) {
+    func setCurrentState(path: String, file: URL) {
         if (diretoryPath.isPathFile(path: path)) {
-            setCurrentByChoice(path: path)
+            setCurrentByChoice(path: path, file: file)
         } else {
-            setCurrentByFirstInDirectory(path: path)
+            setCurrentByFirstInDirectory(path: path, file: file)
         }
     }
     
-    func setCurrentByChoice(path: String) {
+    func setCurrentByChoice(path: String, file: URL) {
+        print(file)
         let chosenDirectory = diretoryPath.getDirectoryOfImage(image: path)
         self.currentDirectory = chosenDirectory
-
+        self.cgUrl = file
+        
         if let currentFilePos = filesInDir.currentFile(
             current: path,
             dir: self.currentDirectory,
@@ -79,21 +111,55 @@ final class CurrentAppState: ObservableObject {
             self.currentFileNumber = currentFilePos.position
             self.totalFiles = currentFilePos.totalFiles
             self.allFiles = currentFilePos.allFilesInDir
+            self.cgUrl = file
         }
     }
     
-    func setCurrentByFirstInDirectory(path: String) {
+    func setCurrentByFirstInDirectory(path: String, file: URL) {
+        print(file)
+
         let firstImage = diretoryPath.getFirstFile(directory: path) ?? ""
         self.currentDirectory = path
         
         if (firstImage.count > 0) {
+            print("count")
+            print(firstImage)
             if let firstFile = filesInDir.firstFile(dir: self.currentDirectory) {
+                print("yo")
+                print(firstFile.path)
                 self.currentFile = firstFile.path
                 self.currentFileNumber = firstFile.position
                 self.totalFiles = firstFile.totalFiles
                 self.allFiles = firstFile.allFilesInDir
+                self.cgUrl = URL(fileURLWithPath: firstFile.path)
             }
         }
+    }
+    
+    // flip vertical
+    func flipVertical() {
+        if self.isVertFlipped {
+            self.isVertFlipped = false
+        } else {
+            self.isVertFlipped = true
+        }
+    }
+    
+    // flip horizontal
+    func flipHorizontal() {
+        if self.isHorzFlipped {
+            self.isHorzFlipped = false
+        } else {
+            self.isHorzFlipped = true
+        }
+    }
+    
+    func rotateLeft() {
+        
+    }
+    
+    func rotateRight() {
+        
     }
 }
 

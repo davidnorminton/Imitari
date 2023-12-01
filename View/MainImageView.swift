@@ -15,7 +15,6 @@ struct MainImageView: View {
         AnyView(
             GeometryReader { geometry in
                 ScrollView([.horizontal, .vertical], showsIndicators: true) {
-
                     MainImage()
                         .environmentObject(currentAppState)
                         .onAppear {
