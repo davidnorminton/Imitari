@@ -20,6 +20,8 @@ final class CurrentAppState: ObservableObject {
     @Published var isVertFlipped = false
     @Published var isHorzFlipped = false
     @Published var showMenu = false
+    @Published var appHeight = CGFloat()
+    @Published var appWidth = CGFloat()
     
     var diretoryPath = DirectoryPath()
     var filesInDir = FilesInDirectory()

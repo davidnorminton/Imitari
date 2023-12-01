@@ -47,7 +47,6 @@ struct ImitariApp: App {
                     isPresented: $importing,
                     allowedContentTypes: [.png, .jpeg, .gif, .directory]
                 ) { result in
-                    print("Loading file")
                     switch result {
                     case .success(let file):
                         let filePath: String = file.path()

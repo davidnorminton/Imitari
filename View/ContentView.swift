@@ -24,7 +24,7 @@ struct ContentView: View {
 
                     VStack {
                         if (currentAppState.currentFile.count > 0) {
-                            MainImage().environmentObject(currentAppState)
+                            MainImageView().environmentObject(currentAppState)
                         } else {
                             Home()
                         }
