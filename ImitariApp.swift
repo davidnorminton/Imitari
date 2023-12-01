@@ -11,18 +11,12 @@ import Foundation
 
 @main
 struct ImitariApp: App {
-    
-    @State private var importing = false
-
-    
+   
     // EnviromentObject states
     @StateObject var currentAppState = CurrentAppState()
     @StateObject var slideShowState = SlideShowState()
-
-
-    var diretoryPath = DirectoryPath()
-    var filesInDir = FilesInDirectory()
     
+    @State private var importing = false
     @State private var windowCount = 1
 
     var body: some Scene {
@@ -38,21 +32,7 @@ struct ImitariApp: App {
                     Logger.shared.log(url.relativePath)
                     Logger.shared.log(url.path())
 
-                    if (diretoryPath.isPathFile(path: url.path())) {
-                        let chosenDirectory = diretoryPath.getDirectoryOfImage(image: url.path())
-                        currentAppState.currentDirectory = chosenDirectory
-
-                        if let currentFilePos = filesInDir.currentFile(
-                            current: url.absoluteString,
-                            dir: currentAppState.currentDirectory,
-                            type: "current"
-                        ) {
-                            currentAppState.currentFile = currentFilePos.path
-                            currentAppState.currentFileNumber = currentFilePos.position
-                            currentAppState.totalFiles = currentFilePos.totalFiles
-                            currentAppState.allFiles = currentFilePos.allFilesInDir
-                        }
-                    }
+                    currentAppState.setCurrentByChoice(path: url.path())
                 })
             }
         }
@@ -71,35 +51,9 @@ struct ImitariApp: App {
                     switch result {
                     case .success(let file):
                         let filePath: String = file.path()
-                        print(file)
 
-                        if (diretoryPath.isPathFile(path: filePath)) {
-                            let chosenDirectory = diretoryPath.getDirectoryOfImage(image: filePath)
-                            currentAppState.currentDirectory = chosenDirectory
- 
-                            if let currentFilePos = filesInDir.currentFile(
-                                current: filePath,
-                                dir: currentAppState.currentDirectory,
-                                type: "current"
-                            ) {
-                                currentAppState.currentFile = currentFilePos.path
-                                currentAppState.currentFileNumber = currentFilePos.position
-                                currentAppState.totalFiles = currentFilePos.totalFiles
-                                currentAppState.allFiles = currentFilePos.allFilesInDir
-                            }
-                        } else {
-                            let firstImage = diretoryPath.getFirstFile(directory: filePath) ?? ""
-                            currentAppState.currentDirectory = filePath
-                            
-                            if (firstImage.count > 0) {
-                                if let firstFile = filesInDir.firstFile(dir: currentAppState.currentDirectory) {
-                                    currentAppState.currentFile = firstFile.path
-                                    currentAppState.currentFileNumber = firstFile.position
-                                    currentAppState.totalFiles = firstFile.totalFiles
-                                    currentAppState.allFiles = firstFile.allFilesInDir
-                                }
-                            }
-                        }
+                        currentAppState.setCurrentState(path: filePath)
+                        
                         file.stopAccessingSecurityScopedResource()
                     case .failure(let error):
                         print(error.localizedDescription)
@@ -108,40 +62,16 @@ struct ImitariApp: App {
 
             }
             CommandMenu("Tools") {
-                
+                // Next, previous
                 Navigate().environmentObject(currentAppState)
-                
+                // slideshow controls
                 SlideShowCmd().environmentObject(slideShowState)
-                
+                // Image zoom
                 ZoomCmdsGroup().environmentObject(currentAppState)
-                
+                // Aspect ratio
                 ScaleContent().environmentObject(currentAppState)
-
-                
-                Button("Rotate left") {
-                    
-                }
-                Button("Rotate right") {
-                    
-                }
-                
-                Button("Flip vertical") {
-                    // flip vertical
-                    if currentAppState.isVertFlipped {
-                        currentAppState.isVertFlipped = false
-                    } else {
-                        currentAppState.isVertFlipped = true
-                    }
-                }
-                
-                Button("Flip horizonatal") {
-                    // flip horizontal
-                    if currentAppState.isHorzFlipped {
-                        currentAppState.isHorzFlipped = false
-                    } else {
-                        currentAppState.isHorzFlipped = true
-                    }
-                }
+                // Rotate, flip
+                AxisCmds().environmentObject(currentAppState)
             }
         }
     }

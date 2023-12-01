@@ -21,6 +21,9 @@ final class CurrentAppState: ObservableObject {
     @Published var isHorzFlipped = false
     @Published var showMenu = false
     
+    var diretoryPath = DirectoryPath()
+    var filesInDir = FilesInDirectory()
+
     /**
      * Goto next file in list
      */
@@ -49,6 +52,44 @@ final class CurrentAppState: ObservableObject {
             } else {
                 self.currentFile = self.currentDirectory + "/" + self.allFiles[self.currentFileNumber]
                 self.currentFileNumber += 1
+            }
+        }
+    }
+    
+    func setCurrentState(path: String) {
+        if (diretoryPath.isPathFile(path: path)) {
+            setCurrentByChoice(path: path)
+        } else {
+            setCurrentByFirstInDirectory(path: path)
+        }
+    }
+    
+    func setCurrentByChoice(path: String) {
+        let chosenDirectory = diretoryPath.getDirectoryOfImage(image: path)
+        self.currentDirectory = chosenDirectory
+
+        if let currentFilePos = filesInDir.currentFile(
+            current: path,
+            dir: self.currentDirectory,
+            type: "current"
+        ) {
+            self.currentFile = currentFilePos.path
+            self.currentFileNumber = currentFilePos.position
+            self.totalFiles = currentFilePos.totalFiles
+            self.allFiles = currentFilePos.allFilesInDir
+        }
+    }
+    
+    func setCurrentByFirstInDirectory(path: String) {
+        let firstImage = diretoryPath.getFirstFile(directory: path) ?? ""
+        self.currentDirectory = path
+        
+        if (firstImage.count > 0) {
+            if let firstFile = filesInDir.firstFile(dir: self.currentDirectory) {
+                self.currentFile = firstFile.path
+                self.currentFileNumber = firstFile.position
+                self.totalFiles = firstFile.totalFiles
+                self.allFiles = firstFile.allFilesInDir
             }
         }
     }
