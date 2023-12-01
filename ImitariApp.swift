@@ -110,12 +110,10 @@ struct ImitariApp: App {
             CommandMenu("Tools") {
                 
                 Navigate().environmentObject(currentAppState)
-
                 
                 SlideShowCmd().environmentObject(slideShowState)
                 
                 ZoomCmdsGroup().environmentObject(currentAppState)
-
                 
                 ScaleContent().environmentObject(currentAppState)
 
