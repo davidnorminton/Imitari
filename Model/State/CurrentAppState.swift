@@ -29,7 +29,6 @@ final class CurrentAppState: ObservableObject {
 
     
     func setCurrentFileUrl() {
-        print("reached")
         // Safely unwrap the optional file path
         guard let decodedFilePath = currentFile.removingPercentEncoding else {
             print("Unable to decode file path")
@@ -57,12 +56,8 @@ final class CurrentAppState: ObservableObject {
             if currentFileNumber == 1 {
                 currentFile = currentDirectory + "/" + allFiles[fileCount - 1]
                 currentFileNumber = fileCount
-                print("current")
-                print(currentFile)
             } else {
                 currentFile = currentDirectory + "/" + allFiles[currentFileNumber - 2]
-                print("current")
-                print(currentFile)
                 currentFileNumber -= 1
             }
             
@@ -97,7 +92,6 @@ final class CurrentAppState: ObservableObject {
     }
     
     func setCurrentByChoice(path: String, file: URL) {
-        print(file)
         let chosenDirectory = diretoryPath.getDirectoryOfImage(image: path)
         self.currentDirectory = chosenDirectory
         self.cgUrl = file
@@ -116,22 +110,18 @@ final class CurrentAppState: ObservableObject {
     }
     
     func setCurrentByFirstInDirectory(path: String, file: URL) {
-        print(file)
-
         let firstImage = diretoryPath.getFirstFile(directory: path) ?? ""
         self.currentDirectory = path
         
         if (firstImage.count > 0) {
-            print("count")
-            print(firstImage)
             if let firstFile = filesInDir.firstFile(dir: self.currentDirectory) {
-                print("yo")
-                print(firstFile.path)
                 self.currentFile = firstFile.path
                 self.currentFileNumber = firstFile.position
                 self.totalFiles = firstFile.totalFiles
                 self.allFiles = firstFile.allFilesInDir
-                self.cgUrl = URL(fileURLWithPath: firstFile.path)
+                if let path = self.currentFile.removingPercentEncoding {
+                    self.cgUrl = URL(fileURLWithPath: path)
+                }
             }
         }
     }

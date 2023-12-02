@@ -74,19 +74,23 @@ class DirectoryPath {
 
         do {
             var files = [String]()
-            let directoryURL = URL(fileURLWithPath: dir)
-            let items = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
-            
-            // Filter files based on allowed types
-            let filteredItems = items.filter { allowedTypes.contains($0.pathExtension.lowercased()) }
-            
-            // Get file names from filtered items
-            files = filteredItems.map { $0.lastPathComponent }
-            
-            // Sort file names using Finder-like natural sorting order
-            files.sort { $0.localizedStandardCompare($1) == .orderedAscending }
-            
-            return files
+            if let dirPath = dir.removingPercentEncoding {
+                let directoryURL = URL(fileURLWithPath: dirPath)
+                let items = try FileManager.default.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
+                
+                // Filter files based on allowed types
+                let filteredItems = items.filter { allowedTypes.contains($0.pathExtension.lowercased()) }
+                
+                // Get file names from filtered items
+                files = filteredItems.map { $0.lastPathComponent }
+                
+                // Sort file names using Finder-like natural sorting order
+                files.sort { $0.localizedStandardCompare($1) == .orderedAscending }
+                
+                return files
+            }
+
+            return nil
         } catch {
             print("Failed to read directory:", error.localizedDescription)
             return nil

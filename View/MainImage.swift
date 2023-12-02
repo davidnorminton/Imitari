@@ -24,8 +24,6 @@ struct MainImage: View {
                 )
             
             switch currentAppState.aspectRatio {
-            case "fit":
-                return AnyView(image.frame(height: currentAppState.appHeight * CGFloat(currentAppState.zoom)))
             case "fill":
                 return AnyView(image.frame(width: currentAppState.appWidth * CGFloat(currentAppState.zoom)))
             default:
