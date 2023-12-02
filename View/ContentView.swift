@@ -9,76 +9,44 @@ import SwiftUI
 
 
 struct ContentView: View {
+        
+    @EnvironmentObject var currentAppState:  CurrentAppState
+    @EnvironmentObject var slideShowState:  SlideShowState
 
-    @Binding var currentFile: String
-    @Binding var currentDirectory: String
-    @Binding var zoom: Double
-    @Binding var currentFileNumber: Int
-    @Binding var totalFiles: Int
-    @Binding var aspectRatio: String
-    @Binding var allFiles: Array<String>
-    @Binding var showSlideShow: Bool
-    @Binding var slideShowInterval: Int
-    @Binding var isVertFlipped: Bool
-    @Binding var isHorzFlipped: Bool
-
-    
-    @State private var showMenu: Bool = false
     
     var aspectRatios = ["fill", "fit"]
     
     var body: some View {
         
         GeometryReader { proxy in
-            if (!showSlideShow) {
+            if (!slideShowState.showSlideShow) {
                 ZStack {
 
                     VStack {
-                        if (currentFile.count > 0) {
-                            MainImage(
-                                currentFile: $currentFile,
-                                zoom: $zoom,
-                                aspectRatio: $aspectRatio,
-                                isVertFlipped: $isVertFlipped,
-                                isHorzFlipped: $isHorzFlipped
-                            )
+                        if (currentAppState.currentFile.count > 0) {
+                            MainImageView().environmentObject(currentAppState)
                         } else {
                             Home()
                         }
                     }
                     
-                    MainHoverMenu(
-                        currentFile: $currentFile,
-                        currentDirectory: $currentDirectory,
-                        zoom: $zoom,
-                        currentFileNumber: $currentFileNumber,
-                        totalFiles: $totalFiles,
-                        showMenu: $showMenu,
-                        allFiles: $allFiles,
-                        showSlideShow: $showSlideShow,
-                        isVertFlipped: $isVertFlipped,
-                        isHorzFlipped: $isHorzFlipped
-                    )
+                    MainHoverMenu()
+                        .environmentObject(currentAppState)
+                        .environmentObject(slideShowState)
                     
                 }
                 .onHover { over in
-                    if over && currentFile.count > 0 {
-                        showMenu = true
+                    if over && currentAppState.currentFile.count > 0 {
+                        currentAppState.showMenu = true
                     } else {
-                        showMenu = false
+                        currentAppState.showMenu = false
                     }
                 }
             } else {
                 ZStack {
-                    SlideShow(
-                        allFiles: $allFiles,
-                        currentDirectory: $currentDirectory,
-                        showSlideShow: $showSlideShow,
-                        currentFile: $currentFile,
-                        currentFileNumber: $currentFileNumber,
-                        aspectRatio: $aspectRatio,
-                        slideShowInterval: $slideShowInterval
-                    )
+                    SlideShow()
+                        .environmentObject(currentAppState)
+                        .environmentObject(slideShowState)
                 }
             }
         }

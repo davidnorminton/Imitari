@@ -28,32 +28,5 @@ struct AxisButtons: View {
         } label: {
             Image(systemName: "rotate.right")
         }
-        
-        Button {
-            // flip vertical
-            if isVertFlipped {
-                isVertFlipped = false
-            } else {
-                isVertFlipped = true
-            }
-        } label: {
-            Image(systemName: "arrow.up.and.down")
-        }
-        .help("Flip vertical")
-        
-        Button {
-            // flip horizontal
-            if isHorzFlipped {
-                isHorzFlipped = false
-            } else {
-                isHorzFlipped = true
-            }
-        } label: {
-            Image(systemName: "arrow.left.and.right")
-        }
-        .help("Flip horizontal")
-        
     }
-    
-    
 }

@@ -10,15 +10,15 @@ import SwiftUI
 
 struct ScaleContent: View {
     
-    @Binding var aspectRatio: String
-    
+    @EnvironmentObject var currentAppState:  CurrentAppState
+
     var body: some View {
         Button("Scale to fit") {
-            aspectRatio = "fit"
+            currentAppState.aspectRatio = "fit"
         }
 
         Button("Scale to fill") {
-            aspectRatio = "fill"
+            currentAppState.aspectRatio = "fill"
         }
     }
 }

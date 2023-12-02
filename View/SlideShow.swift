@@ -14,15 +14,11 @@ extension Image {
 struct SlideShow: View {
     @State private var currentIndex = 0
     @State private var path = ""
-    @Binding var allFiles: [String]
-    @Binding var currentDirectory: String
-    @Binding var showSlideShow: Bool
-    @Binding var currentFile: String
-    @Binding var currentFileNumber: Int
-    @Binding var aspectRatio: String
-    @Binding var slideShowInterval: Int
     @State var counter = 1
-    
+
+    @EnvironmentObject var currentAppState:  CurrentAppState
+    @EnvironmentObject var slideShowState:  SlideShowState
+
     var dirPath = DirectoryPath()
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -31,7 +27,7 @@ struct SlideShow: View {
     var body: some View {
         NavigationStack {
             Text("")
-                .navigationTitle(dirPath.getFileNameFromPath(path: currentFile))
+                .navigationTitle(dirPath.getFileNameFromPath(path: currentAppState.currentFile))
         }
         
         VStack {
@@ -39,7 +35,7 @@ struct SlideShow: View {
                 
                 HStack {
                     GeometryReader { geometry in
-                        switch (aspectRatio) {
+                        switch (currentAppState.aspectRatio) {
                         case "fit":
                             Image(nsImage: image)
                                 .slideShowImageProps(width: geometry.size.width, height: geometry.size.height)
@@ -61,8 +57,8 @@ struct SlideShow: View {
         }
         
         .onReceive(timer) { _ in
-            if counter == slideShowInterval {
-                currentIndex = (currentIndex + 1) % allFiles.count
+            if counter == slideShowState.slideShowInterval {
+                currentIndex = (currentIndex + 1) % currentAppState.allFiles.count
                 loadNextImage()
                 counter = 1
             } else {
@@ -73,16 +69,16 @@ struct SlideShow: View {
             loadNextImage()
         }
         .onTapGesture {
-           showSlideShow = false
+            slideShowState.showSlideShow = false
         }
     }
     
     private func loadNextImage() {
-        let file = allFiles[currentIndex]
-        currentFile = currentDirectory + "/" + file
-        currentFileNumber = currentIndex + 1
+        let file = currentAppState.allFiles[currentIndex]
+        currentAppState.currentFile = currentAppState.currentDirectory + "/" + file
+        currentAppState.currentFileNumber = currentIndex + 1
         
-        let imageURL = URL(fileURLWithPath: currentFile).absoluteURL
+        let imageURL = URL(fileURLWithPath: currentAppState.currentFile).absoluteURL
         
         URLSession.shared.dataTask(with: imageURL) { data, response, error in
             // Use this on main image to get image properties

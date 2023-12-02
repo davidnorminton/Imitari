@@ -10,20 +10,20 @@ import SwiftUI
 
 struct ZoomCmdsGroup: View {
     
-    @Binding var zoom: Double
-    
+    @EnvironmentObject var currentAppState:  CurrentAppState
+
     var zoomState = Zoom()
 
     var body: some View {
         
         Button("Zoom in") {
-            zoom  = zoomState.zoomIn(counter: zoom)
+            currentAppState.zoom  = zoomState.zoomIn(counter: currentAppState.zoom)
         }
         Button("Zoom out") {
-            zoom = zoomState.zoomOut(counter: zoom)
+            currentAppState.zoom = zoomState.zoomOut(counter: currentAppState.zoom)
         }
         Button("Reset zoom") {
-            zoom = zoomState.reset()
+            currentAppState.zoom = zoomState.reset()
         }
     }
 }

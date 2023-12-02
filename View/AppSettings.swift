@@ -9,16 +9,16 @@ import Foundation
 
 struct AppSettings: View {
     
-    @Binding var slideShowInterval: Int
-    
+    @EnvironmentObject var slideShowState:  SlideShowState
+
     var body: some View {
         VStack{
             List {
                 HStack {
                     Text("Interval")
                     Button {
-                        if slideShowInterval > 1 {
-                            slideShowInterval -= 1
+                        if slideShowState.slideShowInterval > 1 {
+                            slideShowState.slideShowInterval -= 1
                         }
                     } label: {
                         Image(systemName: "minus")
@@ -26,10 +26,10 @@ struct AppSettings: View {
                     .background(Color(hue: 1.0, saturation: 0.076, brightness: 0.196))
                     .padding(.leading, 5.0)
                     
-                    Text (String(slideShowInterval) + " s")
+                    Text (String(slideShowState.slideShowInterval) + " s")
                     
                     Button {
-                        slideShowInterval += 1
+                        slideShowState.slideShowInterval += 1
                     } label: {
                         Image(systemName: "plus")
                     }

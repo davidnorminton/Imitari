@@ -29,7 +29,7 @@ class FilesInDirectory {
             for file in allFiles {
                 if (file == currentFileName.removingPercentEncoding) {
                     currentFile.position = counter + 1
-                    currentFile.path = dir + "/" + allFiles[counter]
+                    currentFile.path = (dir.removingPercentEncoding ?? dir) + "/" + allFiles[counter]
                     currentFile.allFilesInDir = allFiles
                     return currentFile
                 }

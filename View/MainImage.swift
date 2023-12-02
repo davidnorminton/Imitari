@@ -1,46 +1,36 @@
+//
+//  MainImage.swift
+//  Imitari
+//
+//  Created by david norminton on 01/12/2023.
+//
+
+import Foundation
 import SwiftUI
 
-
 struct MainImage: View {
-    @Binding var currentFile: String
-    @Binding var zoom: Double
-    @Binding var aspectRatio: String
-    @Binding var isVertFlipped: Bool
-    @Binding var isHorzFlipped: Bool
 
-    var dirPath = DirectoryPath()
-    var imageSaver = ImageSaver()
-    
+    @EnvironmentObject var currentAppState: CurrentAppState
+
     var body: some View {
-        let file = currentFile.removingPercentEncoding
-        let url = URL(fileURLWithPath: file ?? currentFile)
-        
-        if let imageData = try? Data(contentsOf: url),
-           let nsImage = NSImage(data: imageData) {
-            return AnyView(
-                GeometryReader { geometry in
-                    ScrollView([.horizontal, .vertical], showsIndicators: true) {
-                        let image = Image(nsImage: nsImage)
-                            .resizable()
-                            .scaledToFill()
-                            .scaleEffect(x: isHorzFlipped ? -1 : 1, y: isVertFlipped ? -1 : 1)
-
-                        switch aspectRatio {
-                        case "fit":
-                            image.frame(height: CGFloat(geometry.size.height) * CGFloat(zoom))
-                        case "fill":
-                            image.frame(width: CGFloat(geometry.size.width) * CGFloat(zoom))
-                        default:
-                            image.frame(height: CGFloat(geometry.size.height) * CGFloat(zoom))
-                        }
-                    }
-                }
-                .navigationTitle(dirPath.getFileNameFromPath(path: currentFile))
-            )
+        if let cgUrl = currentAppState.cgUrl,
+           let nsImage = NSImage(contentsOf: cgUrl) {
+            let image = Image(nsImage: nsImage)
+                .resizable()
+                .scaledToFill()
+                .scaleEffect(
+                    x: currentAppState.isHorzFlipped ? -1 : 1,
+                    y: currentAppState.isVertFlipped ? -1 : 1
+                )
+            
+            switch currentAppState.aspectRatio {
+            case "fill":
+                return AnyView(image.frame(width: currentAppState.appWidth * CGFloat(currentAppState.zoom)))
+            default:
+                return AnyView(image.frame(height: currentAppState.appHeight * CGFloat(currentAppState.zoom)))
+            }
         } else {
-            return AnyView(Text("Unable to open file: \(currentFile)"))
+            return AnyView(Text("Unable to open file: \(currentAppState.currentFile)"))
         }
     }
-
 }
-
